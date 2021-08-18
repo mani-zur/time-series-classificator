@@ -1,4 +1,4 @@
-from Data import DataReader
+from Data import DataReader, DataGenerator
 
 def main():
     dataRedader = DataReader("D:\Dokumenty\Studia\Praca magisterska\Software\przebiegi\combined.json")
