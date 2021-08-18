@@ -1,12 +1,13 @@
 from tensorflow import keras
 
 class NeuralNetwork():
-    def __init__(self, inputShape, epochs = 250, batchSize = 30) -> None:
+    def __init__(self, generator, epochs = 50) -> None:
         self.epochs = epochs
-        self.batchSize = batchSize
-        self.model = self.buildModel(inputShape)
+        self.generator = generator
+        self.model = self.buildModel((self.generator.dataReader.timeFrameLen, 1))
+        self.runModel()
 
-    def buildModel(input_shape):
+    def buildModel(self, input_shape):
         input_layer = keras.layers.Input(input_shape)
 
         conv1 = keras.layers.Conv1D(filters=64, kernel_size=3, padding="same")(input_layer)
@@ -28,7 +29,7 @@ class NeuralNetwork():
 
         return keras.models.Model(inputs=input_layer, outputs=output_layer)
 
-    def runModel(self, generator):
+    def runModel(self):
         self.model.compile(
             optimizer="adam",
             loss="categorical_crossentropy",
@@ -36,7 +37,8 @@ class NeuralNetwork():
         )
 
         self.history = self.model.fit_generator(
-            generator = generator,
-            use_multiprocessing=True,
-            workers=6,
+            generator = self.generator,
+            epochs=self.epochs,
+            #use_multiprocessing=True,
+            #workers=1,
         )
