@@ -1,6 +1,7 @@
 import json
 import random
 import numpy as np
+import datetime
 from tensorflow import keras
 
 
@@ -11,7 +12,7 @@ class DataReader():
         self.jsonDict = {}
         self.positive = []
         self.negative = []
-        self.logDir = "logs/fit"
+        self.logDir = "logs/fit/"+ datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 
 
