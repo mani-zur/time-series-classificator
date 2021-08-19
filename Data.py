@@ -11,6 +11,9 @@ class DataReader():
         self.jsonDict = {}
         self.positive = []
         self.negative = []
+        self.logDir = "logs/fit"
+
+
 
         with open(filePath, 'r') as jsonFile:
             self.jsonDict = json.load(jsonFile)
