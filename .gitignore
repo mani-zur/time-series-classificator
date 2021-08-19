@@ -68,6 +68,10 @@ instance/
 # Scrapy stuff:
 .scrapy
 
+# Keras stuff:
+*.h5
+*.hdf5
+
 # Sphinx documentation
 docs/_build/
 

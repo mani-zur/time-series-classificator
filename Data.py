@@ -11,8 +11,6 @@ class DataReader():
         self.jsonDict = {}
         self.positive = []
         self.negative = []
-        self.x_data = []
-        self.y_data = []
 
         with open(filePath, 'r') as jsonFile:
             self.jsonDict = json.load(jsonFile)
@@ -39,14 +37,6 @@ class DataReader():
                 newNegative.append(list(map(lambda x, y: (x+y)/2, negative_1, negative_2)))
         self.negative = newNegative
 
-        
-
-
-        # timeseries = np.array(self.x_data)
-        # print(timeseries.shape)
-        # timeseries = timeseries.reshape((timeseries.shape[0], timeseries.shape[1], 1))
-        # print(timeseries.shape)
-
 class DataGenerator(keras.utils.Sequence):
     def __init__(self, dataReader, batchSize, length) -> None:
         super().__init__()
@@ -62,16 +52,15 @@ class DataGenerator(keras.utils.Sequence):
         sample = list(zip(random.sample(self.dataReader.positive, half_size), [True]  * half_size))
         sample = sample + list(zip(random.sample(self.dataReader.negative, half_size), [False]  * half_size))
         np.random.shuffle(sample)
-        #print(sample)
-        x, y = zip(*sample)
-        y = [int(value) for value in y]
 
-        x = np.array(x)
-        
-        #print(x)
-        x = x.reshape((x.shape[0], x.shape[1], 1))
+        X = np.empty((self.batchSize, self.dataReader.timeFrameLen))
+        y = np.empty((self.batchSize, 2 ), dtype=int)
 
-        return np.array(x), np.array(y)
+        for i ,t  in enumerate(sample):
+            X[i]=np.array(t[0])
+            y[i]=np.array([int(t[1]), 1 - int(t[1])])
+
+        return X, y
 
     def on_epoch_end(self):
         pass
