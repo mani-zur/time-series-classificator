@@ -12,9 +12,7 @@ class DataReader():
         self.jsonDict = {}
         self.positive = []
         self.negative = []
-        self.logDir = "logs/fit/"+ datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-
-
+        self.logDir = "logs/fit/"+ datetime.datetime.now().strftime("%d-%m-%Y@%H-%M-%S")
 
         with open(filePath, 'r') as jsonFile:
             self.jsonDict = json.load(jsonFile)
@@ -53,8 +51,8 @@ class DataGenerator(keras.utils.Sequence):
 
     def __getitem__(self, index):
         half_size = int(self.batchSize/2)
-        sample = list(zip(random.sample(self.dataReader.positive, half_size), [True]  * half_size))
-        sample = sample + list(zip(random.sample(self.dataReader.negative, half_size), [False]  * half_size))
+        sample = list(zip(random.sample(self.dataReader.positive, half_size), [1]  * half_size))
+        sample = sample + list(zip(random.sample(self.dataReader.negative, half_size), [0]  * half_size))
         np.random.shuffle(sample)
 
         X = np.empty((self.batchSize, self.dataReader.timeFrameLen))
@@ -62,7 +60,7 @@ class DataGenerator(keras.utils.Sequence):
 
         for i ,t  in enumerate(sample):
             X[i]=np.array(t[0])
-            y[i]=np.array([int(t[1]), 1 - int(t[1])])
+            y[i]=np.array([t[1], 1 -t[1]])
 
         return X, y
 
