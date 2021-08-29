@@ -40,11 +40,12 @@ class DataReader():
         self.negative = newNegative
 
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, dataReader, batchSize, length) -> None:
+    def __init__(self, dataReader, batchSize, length, noiseLevel = 0) -> None:
         super().__init__()
         self.dataReader = dataReader
         self.batchSize = batchSize
         self.length = length
+        self.noiseLevel = noiseLevel
 
     def __len__(self):
         return self.length
@@ -52,7 +53,7 @@ class DataGenerator(keras.utils.Sequence):
     def __getitem__(self, index):
         half_size = int(self.batchSize/2)
         sample = list(zip(random.sample(self.dataReader.positive, half_size), [1]  * half_size))
-        sample = sample + list(zip(random.sample(self.dataReader.negative, half_size), [0]  * half_size))
+        sample += list(zip(random.sample(self.dataReader.negative, half_size), [0]  * half_size))
         np.random.shuffle(sample)
 
         X = np.empty((self.batchSize, self.dataReader.timeFrameLen))
@@ -61,6 +62,11 @@ class DataGenerator(keras.utils.Sequence):
         for i ,t  in enumerate(sample):
             X[i]=np.array(t[0])
             y[i]=np.array([t[1], 1 -t[1]])
+
+        #add random noise to signals
+        if self.noiseLevel:
+            noise = np.random.normal(0, self.noiseLevel , X.shape)
+            X += noise
 
         return X, y
 

@@ -1,11 +1,16 @@
 from tensorflow import keras
 
 class NeuralNetwork():
-    def __init__(self, generator, epochs = 200) -> None:
+    def __init__(self, generator = None, epochs = 200, model = None) -> None:
         self.epochs = epochs
+        if generator is None and model is None:
+            raise AttributeError("No model and no generator, please give one of them!")
         self.generator = generator
-        self.model = self.buildModel_2((self.generator.dataReader.timeFrameLen, 1))
-        self.runModel()
+        if model is None:
+            self.model = self.buildModel((self.generator.dataReader.timeFrameLen, 1))
+            self.runModel()
+        else:
+            self.model = keras.models.load_model(model)
 
     def buildModel(self, input_shape):
         input_layer = keras.layers.Input(input_shape)
@@ -51,7 +56,7 @@ class NeuralNetwork():
     def runModel(self):
         callbacks = [
             keras.callbacks.ModelCheckpoint(
-                "best_model.h5", save_best_only=True, monitor="val_loss"
+                self.generator.dataReader.logDir + "/best_model" , save_best_only=True, monitor="val_loss"
             ),
             keras.callbacks.ReduceLROnPlateau(
                 monitor="val_loss", factor=0.5, patience=20, min_lr=0.0001
@@ -77,3 +82,5 @@ class NeuralNetwork():
             #use_multiprocessing=True,
             #workers=1,
         )
+
+        self.model.save(self.generator.dataReader.logDir +"/final_model")
