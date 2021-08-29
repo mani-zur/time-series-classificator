@@ -1,8 +1,10 @@
 from tensorflow import keras
 
 class NeuralNetwork():
-    def __init__(self, generator, epochs = 200, model = None) -> None:
+    def __init__(self, generator = None, epochs = 200, model = None) -> None:
         self.epochs = epochs
+        if generator is None and model is None:
+            raise AttributeError("No model and no generator, please give one of them!")
         self.generator = generator
         if model is None:
             self.model = self.buildModel((self.generator.dataReader.timeFrameLen, 1))
